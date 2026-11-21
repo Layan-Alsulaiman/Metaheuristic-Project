@@ -27,7 +27,9 @@ Quick test outputs are saved in `results/quick/`; full results in `results/`.
 ## Experimental setup
 
 - Instances: `kp_sc_500` (500 items, capacity 2518), `kp_sc_1000` (1000 items, capacity 5068).
-- Reference optimal values: **4078** and **8228**, computed separately by an exact DP check. The project does not run DP.
+- Reference optimal values: 4078 and 8228,
+  obtained from Symmetry (2025), Table 3.
+  DOI: 10.3390/sym17091538.
 - Independent SA seeds: 42 through 61, 20 runs per neighborhood per instance.
 - Full run: 50,000 iterations; initial target acceptance probability 0.8, final temperature 0.01; record convergence every 500 iterations.
 - Greedy is deterministic and run once for its value. Its runtime is averaged over 50 calls.
