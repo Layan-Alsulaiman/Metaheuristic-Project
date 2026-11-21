@@ -15,8 +15,6 @@ Operators
     N2  swap_neighbor : remove one selected item AND add one unselected item,
                         then fill any free space with random items that fit
                         -> bigger, sideways step; keeps the knapsack full
-    N3  hybrid_neighbor: choose N1 or N2 at random each iteration (50/50)
-                        -> combines both neighbourhoods
 
 If a move makes the knapsack overweight, helpers.repair() removes the
 lowest-ratio items (never the item just added) until it fits again.
@@ -78,17 +76,8 @@ def swap_neighbor(state, inst, rng):
     weight, value = random_fill(y, weight, value, inst, rng, exclude=i_out)
     return y, weight, value
 
-
-def hybrid_neighbor(state, inst, rng):
-    """N3 — Hybrid: 50% flip, 50% swap."""
-    if rng.random() < 0.5:
-        return flip_neighbor(state, inst, rng)
-    return swap_neighbor(state, inst, rng)
-
-
 # Registry used by run_experiments.py
 NEIGHBORHOODS = {
     "Flip": flip_neighbor,
-    "Swap": swap_neighbor,
-    "Hybrid": hybrid_neighbor,
+    "Swap": swap_neighbor
 }

@@ -6,7 +6,7 @@ Design summary
     Objective       : maximise f(x) = sum p_i x_i
     Constraint      : sum w_i x_i <= C  (kept feasible at all times by repair)
     Initial solution: random feasible solution (helpers.random_feasible_solution)
-    Neighbourhood   : one operator from neighborhoods.py (Flip / Swap / Hybrid)
+    Neighbourhood   : one operator from neighborhoods.py (Flip / Swap)
     Acceptance      : Metropolis rule
                         accept if delta >= 0
                         else accept with probability exp(delta / T)

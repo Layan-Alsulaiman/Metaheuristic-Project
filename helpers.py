@@ -9,12 +9,11 @@ solutions and measure time in exactly the same way (a fair comparison).
 
 Contents
     1. Instance loading          -> load_instance()
-    2. Solution evaluation        -> total_value(), total_weight(), is_feasible()
+    2. Solution evaluation        -> total_value(), total_weight()
     3. Feasibility repair / fill  -> repair(), random_fill()
-    4. Initial solutions          -> random_feasible_solution(), empty_solution()
-    5. Exact reference (optimum)  -> dp_optimal()
-    6. Timing                     -> Timer
-    7. Statistics / reporting     -> summarize(), gap_percent()
+    4. Initial solution           -> random_feasible_solution()
+    5. Timing                     -> Timer
+    6. Statistics / reporting     -> summarize(), gap_percent()
 """
 
 import os
@@ -96,11 +95,6 @@ def total_weight(x, inst):
     return sum(w for w, xi in zip(inst.weights, x) if xi)
 
 
-def is_feasible(x, inst):
-    """True if the solution respects the capacity constraint."""
-    return total_weight(x, inst) <= inst.capacity
-
-
 # =====================================================================
 # 3. Feasibility repair
 # =====================================================================
@@ -158,13 +152,8 @@ def random_fill(x, weight, value, inst, rng, exclude=None):
 
 
 # =====================================================================
-# 4. Initial solutions
+# 4. Initial solution
 # =====================================================================
-
-def empty_solution(inst):
-    """All-zero solution (always feasible)."""
-    return [0] * inst.n
-
 
 def random_feasible_solution(inst, rng):
     """Random feasible start: visit items in random order and add each
@@ -182,44 +171,8 @@ def random_feasible_solution(inst, rng):
             weight += inst.weights[i]
     return x
 
-
 # =====================================================================
-# 5. Exact reference: dynamic programming
-#    The dataset does not publish optimal values, so we compute them.
-#    Complexity O(n * C) — fast for these instances (n<=1000, C~5000).
-# =====================================================================
-
-def dp_optimal(inst):
-    """Return (optimal_value, optimal_solution) via 0/1 knapsack DP."""
-    n, C = inst.n, inst.capacity
-    w = np.array(inst.weights, dtype=np.int64)
-    v = np.array(inst.values, dtype=np.int64)
-
-    dp = np.zeros(C + 1, dtype=np.int64)          # dp[c] = best value with capacity c
-    take = np.zeros((n, C + 1), dtype=bool)       # take[i, c] = item i used at capacity c
-
-    for i in range(n):
-        wi, vi = w[i], v[i]
-        if wi > C:
-            continue
-        # candidate value if item i is taken (vectorised, iterates c downwards implicitly)
-        cand = dp[:C + 1 - wi] + vi
-        better = cand > dp[wi:]
-        take[i, wi:] = better
-        dp[wi:] = np.where(better, cand, dp[wi:])
-
-    # backtrack to recover the chosen items
-    x = [0] * n
-    c = C
-    for i in range(n - 1, -1, -1):
-        if take[i, c]:
-            x[i] = 1
-            c -= inst.weights[i]
-    return int(dp[C]), x
-
-
-# =====================================================================
-# 6. Timing
+# 5. Timing
 # =====================================================================
 
 class Timer:
@@ -240,7 +193,7 @@ class Timer:
 
 
 # =====================================================================
-# 7. Statistics / reporting
+# 6. Statistics / reporting
 # =====================================================================
 
 def gap_percent(found, optimum):
