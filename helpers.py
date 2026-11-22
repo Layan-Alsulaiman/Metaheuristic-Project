@@ -75,17 +75,15 @@ def load_instance(path):
 
 # =====================================================================
 # 2. Solution evaluation
-#    A solution is encoded as a binary list x of length n:
-#    x[i] = 1  -> item i is in the knapsack,  x[i] = 0 -> it is not.
 # =====================================================================
 
 def total_value(x, inst):
-    """Objective function f(x) = sum p_i * x_i."""
+    """calculate the objective value: sum of profits of selected items."""
     return sum(v for v, xi in zip(inst.values, x) if xi)
 
 
 def total_weight(x, inst):
-    """Constraint left-hand side  sum w_i * x_i."""
+    """Calculate the total weight of selected items to check feasibility."""
     return sum(w for w, xi in zip(inst.weights, x) if xi)
 
 
@@ -94,49 +92,60 @@ def total_weight(x, inst):
 # =====================================================================
 
 def repair(x, weight, value, inst, protected=None):
-    """Make an overweight solution feasible (in place).
+    """
+    Make an overweight solution feasible.
 
     Strategy: remove selected items with the WORST value/weight ratio
-    first, until the total weight fits the capacity. This keeps the
-    most "efficient" items, so the loss in value is as small as possible.
+    first, until the total weight fits the capacity.
 
     Parameters
     ----------
     x, weight, value : current solution and its (cached) weight / value
     protected        : optional item index that must not be removed
-                       (e.g. the item the neighbour move just added)
 
     Returns
     -------
     (weight, value) after repair. x is modified in place.
     """
+
+    # no repair is needed if the solution is already feasible 
     if weight <= inst.capacity:
         return weight, value
 
-    # walk from the worst ratio to the best
+    # start from the worst ratio to the best
     for i in reversed(inst.ratio_order):
         if x[i] and i != protected:
             x[i] = 0
             weight -= inst.weights[i]
             value -= inst.values[i]
+            # stop removing items once the solution becomes feasible
             if weight <= inst.capacity:
                 break
     return weight, value
 
 
 def random_fill(x, weight, value, inst, rng, exclude=None):
-    """Add random unselected items while they fit (in place).
-
-    Scans all items once, starting from a random position, so it costs
-    O(n) and never adds `exclude` (e.g. the item a move just removed).
-    Returns the updated (weight, value).
     """
+    Add random unselected items while they fit.
+
+    Items are examined starting at a randomly
+    selected index, introducing variation between candidate solutions.
+
+    The excluded item is skipped to avoid immediately reversing
+    the previous neighborhood move.
+
+    Modifies x in place and returns the updated weight and value.
+    """
+    
+    # calculate how much capacity is still available
     free = inst.capacity - weight
     if free <= 0:
         return weight, value
+    # choose a random starting index
     start = rng.randrange(inst.n)
     for k in range(inst.n):
         i = (start + k) % inst.n
+        # add the item only if it is unselected, allowed, and fits
         if not x[i] and i != exclude and inst.weights[i] <= free:
             x[i] = 1
             free -= inst.weights[i]
@@ -150,13 +159,16 @@ def random_fill(x, weight, value, inst, rng, exclude=None):
 # =====================================================================
 
 def random_feasible_solution(inst, rng):
-    """Random feasible start: visit items in random order and add each
-    one with probability 0.5 if it still fits.
-
-    rng : a random.Random object (so every run is reproducible by seed)
     """
+    Generate a random, feasible initial solution for SA.
+
+    Items are visited in a shuffled order, each with a 50% chance
+    of being selected, provided it fits within the remaining capacity.
+    """
+    # start with an empty knapsack 
     x = [0] * inst.n
     weight = 0
+    # shuffle the item indices to randomize the selection order
     order = list(range(inst.n))
     rng.shuffle(order)
     for i in order:
@@ -170,18 +182,18 @@ def random_feasible_solution(inst, rng):
 # =====================================================================
 
 class Timer:
-    """Context manager that measures wall-clock time in seconds.
+    """    
+    Measure elapsed execution time in seconds using a context manager.
 
-    Usage:
-        with Timer() as t:
-            do_something()
-        print(t.elapsed)
+    Used to compare the computational efficiency of Greedy and SA.
     """
     def __enter__(self):
+        # record the start time
         self._start = time.perf_counter()
         return self
 
     def __exit__(self, *exc):
+        # calcuate the elapsed time
         self.elapsed = time.perf_counter() - self._start
         return False
 
@@ -191,12 +203,16 @@ class Timer:
 # =====================================================================
 
 def gap_percent(found, optimum):
-    """Relative gap to the optimum in %:  (opt - found) / opt * 100."""
+    """    
+    Calculate the percentage gap between a solution and the
+    published optimal objective value.
+
+    A smaller gap indicates a better solution."""
     return 100.0 * (optimum - found) / optimum
 
 
 def summarize(values):
-    """Basic descriptive statistics over a list of numbers."""
+    """Basic descriptive statistics over multiple runs."""
     a = np.asarray(values, dtype=float)
     return {
         "best": a.max(),
@@ -208,5 +224,5 @@ def summarize(values):
 
 
 def make_rng(seed):
-    """Create an independent, reproducible random generator."""
+    """Create a random number generator initialized with a given seed."""
     return random.Random(seed)

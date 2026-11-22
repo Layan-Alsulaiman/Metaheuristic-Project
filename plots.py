@@ -1,14 +1,21 @@
 """
 plots.py
 --------
-Creates the figures for the report / slides from the files in results/.
-Run after run_experiments.py.
+Generate figures for comparing Greedy and Simulated Annealing.
 
-Figures (results/figures/):
-    convergence_<instance>.png  mean best-so-far value vs iteration, per neighbourhood,
-                                with the greedy value and the optimum as reference lines
-    runtime.png                 mean runtime per algorithm (log scale)
-    gap.png                     best and mean gap to the optimum per algorithm
+Reads the results saved by run_experiments.py and creates:
+
+1. Convergence plots: Show how SA's best-so-far value improves
+   over iterations, including variability across runs.
+
+2. Runtime plot: Compares the average execution time of Greedy,
+   SA-Flip, and SA-Swap.
+
+3. Gap plot: Compares how close each algorithm gets to the
+   published optimal value.
+
+The plots are saved in results/figures/.
+Quick-mode figures are saved separately in results/quick/figures/.
 """
 
 import os
@@ -30,9 +37,8 @@ RESULTS_DIR = (
 
 FIG_DIR = os.path.join(RESULTS_DIR, "figures")
 
-# Fixed colour per entity (never by rank) — validated categorical slots 1-2
 COLORS = {"Flip": "#2a78d6", "Swap": "#eb6834"}
-GREEDY_COLOR = "#52514e"   # neutral ink for the reference algorithm
+GREEDY_COLOR = "#52514e"   
 OPT_COLOR = "#0b0b0b"
 GRID = "#e1e0d9"
 
