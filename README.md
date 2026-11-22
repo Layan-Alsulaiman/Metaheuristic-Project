@@ -46,8 +46,3 @@ Quick test outputs are saved in `results/quick/`; full results in `results/`.
 - `run_experiments.py`: executes the comparison and saves CSV/JSON results.
 - `plots.py`: creates effectiveness, runtime, and two convergence figures.
 - `requirements.txt`: Python dependencies.
-
-## Interpreting the results
-
-Gap (%) = `(reference optimum - found value) / reference optimum * 100`.
-Lower gap is better; higher objective value is better. Greedy is a deterministic baseline, whereas SA is repeated with different seeds.
