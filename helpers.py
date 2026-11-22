@@ -1,12 +1,6 @@
 """
 helpers.py
 ----------
-Shared utility functions used by every other module in the project.
-
-Keeping these in one place means the greedy algorithm, the simulated
-annealing algorithm and the experiment driver all read data, evaluate
-solutions and measure time in exactly the same way (a fair comparison).
-
 Contents
     1. Instance loading          -> load_instance()
     2. Solution evaluation        -> total_value(), total_weight()
@@ -34,14 +28,12 @@ class KnapsackInstance:
 
     Attributes
     ----------
-    name      : file name without extension, e.g. 'kp_uc_500'
+    name      : Dataset name 
     n         : number of items
     values    : list of profits  p_i
     weights   : list of weights  w_i
     capacity  : knapsack capacity C
-    ratio_order : item indices sorted by value/weight ratio, DESCENDING
-                  (best items first). Pre-computed once because both the
-                  greedy algorithm and the SA repair step need it.
+    ratio_order : item indices sorted by descending value/weight ratio
     """
     name: str
     n: int
@@ -59,9 +51,11 @@ def load_instance(path):
         next N lines   : index  profit  weight
         last line      : capacity C
     """
+    # read the file and split each line into columns, ignoring empty lines
     with open(path, "r") as f:
         tokens = [line.split() for line in f if line.strip()]
 
+    # extract item profits and weights, and the knapsack capacity
     n = int(tokens[0][0])
     values, weights = [], []
     for row in tokens[1:1 + n]:
