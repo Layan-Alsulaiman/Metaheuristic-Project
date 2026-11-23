@@ -64,13 +64,16 @@ def load_instance(path):
         weights.append(int(row[2]))
     capacity = int(tokens[1 + n][0])
 
-    # Sort by ratio p/w descending (ties broken by larger value first)
-    ratio_order = sorted(range(n),
-                         key=lambda i: (values[i] / weights[i], values[i]),
-                         reverse=True)
-
     name = os.path.splitext(os.path.basename(path))[0]
-    return KnapsackInstance(name, n, values, weights, capacity, ratio_order)
+    return KnapsackInstance(name, n, values, weights, capacity,
+                            sort_by_ratio(values, weights))
+
+
+def sort_by_ratio(values, weights):
+    """Return item indices by descending profit-to-weight ratio, then profit."""
+    return sorted(range(len(values)),
+                  key=lambda i: (values[i] / weights[i], values[i]),
+                  reverse=True)
 
 
 # =====================================================================

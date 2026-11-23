@@ -32,7 +32,8 @@ Quick test outputs are saved in `results/quick/`; full results in `results/`.
   DOI: 10.3390/sym17091538.
 - Independent SA seeds: 42 through 61, 20 runs per neighborhood per instance.
 - Full run: 50,000 iterations; initial target acceptance probability 0.8, final temperature 0.01; record convergence every 500 iterations.
-- Greedy is deterministic and run once for its value. Its runtime is averaged over 50 calls.
+- Greedy is deterministic. Runtime averages 50 calls, each including ratio sorting and item selection.
+- SA runtime includes initialization, temperature calibration, and all search iterations. SA reuses the ratio order prepared during dataset loading for feasibility repair. Both timers exclude file I/O and result validation.
 - Results include best and mean objective values, worst value, sample standard deviation, gap to reference optimum, and mean runtime.
 
 ## Files

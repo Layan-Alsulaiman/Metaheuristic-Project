@@ -61,10 +61,6 @@ def convergence_plot(inst, curves, optimum, greedy_value):
     ax.axhline(optimum, color=OPT_COLOR, ls=":", lw=1.5, label=f"Reference optimum = {optimum}")
     ax.axhline(greedy_value, color=GREEDY_COLOR, ls="--", lw=1.5,
                label=f"Greedy = {greedy_value}")
-    # zoom on the interesting region (late iterations)
-    lo = min(greedy_value, min(np.array([[p[1] for p in r] for r in runs])[:, -1].min()
-                               for runs in curves.values()))
-    ax.set_ylim(lo - 0.02 * optimum, optimum + 0.005 * optimum)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Best value found so far")
     ax.set_title(f"SA convergence — {inst}", loc="left")

@@ -36,7 +36,7 @@ from simulated_annealing import simulated_annealing
 
 
 def run_greedy(inst, optimum):
-    """Run ratio Greedy and average its runtime."""
+    """Average the runtime of ratio sorting and selection together."""
 
     with Timer() as t:
         for _ in range(config.GREEDY_TIMING_REPEATS):
